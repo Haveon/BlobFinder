@@ -1,5 +1,6 @@
-from scipy.ndimage import imread, label, center_of_mass
+from scipy.ndimage import imread, label, center_of_mass, gaussian_filter
 from argparse import ArgumentParser
+from matplotlib import pyplot as plt
 
 def imLoad(fname):
     """
@@ -17,11 +18,17 @@ def findBlob(tgtImg,refImg):
     of mass of a the one blob in the image.
     Returns the coordinates of the blob's center of mass
     """
-    img = abs(tgtImg - refImg) #remove background
-    img[img<25] = 0 #Truncate low intensities to zero
+    img = abs(tgtImg - refImg) # Remove background
+    img = gaussian_filter(img,39) # Filter out some noise
+    img[img<60 ] = 0 # Truncate low intensities to zero
 
     labeledArray, numFeatures = label(img)
-    assert numFeatures==1, "There is more than one recognized object"
+    plt.subplot(221)
+    plt.imshow(img)
+    plt.subplot(223)
+    plt.imshow(labeledArray)
+    plt.show()
+    assert 0<numFeatures<2, "There are {} recognized objects, there can only be one".format(numFeatures)
 
     coord = center_of_mass(labeledArray)
     return coord
