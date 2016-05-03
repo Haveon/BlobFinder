@@ -17,7 +17,7 @@ def findBlob(tgtImg,refImg):
     of mass of a the one blob in the image.
     Returns the coordinates of the blob's center of mass
     """
-    img = tgtImg - refImg #remove background
+    img = abs(tgtImg - refImg) #remove background
     img[img<25] = 0 #Truncate low intensities to zero
 
     labeledArray, numFeatures = label(img)
