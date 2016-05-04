@@ -43,8 +43,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('tgtFname', help='Filepath to target image')
     parser.add_argument('refFname', help='Filepath to reference image')
-    parser.add_argument('--filterSigma', default=39, type=int, help='Value of Sigma in gaussian_filter')
-    parser.add_argument('--threshold', default=60, type=int, help='Truncation Threshold')
+    parser.add_argument('--filterSigma', default=9, type=int, help='Value of Sigma in gaussian_filter')
+    parser.add_argument('--threshold', default=65, type=int, help='Truncation Threshold')
 
     args = parser.parse_args()
     print blobCoord(args.tgtFname, args.refFname, args.filterSigma, args.threshold)
