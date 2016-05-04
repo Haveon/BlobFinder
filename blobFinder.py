@@ -12,15 +12,15 @@ def imLoad(fname):
     gray = 0.2989*r + 0.5870*g + 0.1140*b
     return gray
 
-def findBlob(tgtImg,refImg):
+def findBlob(tgtImg, refImg, filterSigma=39, threshold=60):
     """
     Given a target Image and a reference Image (background), finds the center
     of mass of a the one blob in the image.
     Returns the coordinates of the blob's center of mass
     """
-    img = abs(tgtImg - refImg) # Remove background
-    img = gaussian_filter(img,39) # Filter out some noise
-    img[img<60 ] = 0 # Truncate low intensities to zero
+    img = abs(tgtImg - refImg)              # Remove background
+    img = gaussian_filter(img,filterSigma)  # Filter out some noise
+    img[img<threshold] = 0                  # Truncate low intensities to zero
 
     labeledArray, numFeatures = label(img)
     plt.subplot(221)
