@@ -33,15 +33,18 @@ def findBlob(tgtImg, refImg, filterSigma=39, threshold=60):
     coord = center_of_mass(labeledArray)
     return coord
 
-def blobCoord(fnameTgt, fnameRef):
+def blobCoord(fnameTgt, fnameRef, filterSigma=39, threshold=60):
     tgtImg = imLoad(fnameTgt)
     refImg = imLoad(fnameRef)
-    coord = findBlob(tgtImg,refImg)
+    coord = findBlob(tgtImg, refImg, filterSigma, threshold)
     return coord
 
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('tgtFname', help='Filepath to target image')
     parser.add_argument('refFname', help='Filepath to reference image')
+    parser.add_argument('--filterSigma', default=39, type=int, help='Value of Sigma in gaussian_filter')
+    parser.add_argument('--threshold', default=60, type=int, help='Truncation Threshold')
+
     args = parser.parse_args()
-    print blobCoord(args.tgtFname, args.refFname)
+    print blobCoord(args.tgtFname, args.refFname, args.filterSigma, args.threshold)
