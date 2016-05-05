@@ -19,8 +19,8 @@ def findBlob(tgtImg, refImg, filterSigma=39, threshold=60):
     Returns the coordinates of the blob's center of mass
     """
     img = abs(tgtImg - refImg)              # Remove background
-    img = gaussian_filter(img,filterSigma)  # Filter out some noise
     img[img<threshold] = 0                  # Truncate low intensities to zero
+    img = gaussian_filter(img,filterSigma)  # Filter out some noise    
 
     labeledArray, numFeatures = label(img)
     plt.subplot(221)
