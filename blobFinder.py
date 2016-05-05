@@ -1,5 +1,5 @@
-from scipy.ndimage import imread, label, center_of_mass, gaussian_filter, sobel
-from numpy import nonzero, argmax, arctan2
+from scipy.ndimage import imread, label, center_of_mass, gaussian_filter, sobel, find_objects
+from numpy import nonzero, argmax, arctan2, rad2deg
 from argparse import ArgumentParser
 from matplotlib import pyplot as plt
 
@@ -9,7 +9,7 @@ class Blob:
         self._fx, self._fy = farX, farY
 
         self.orientationVector = farX - x, farY - y
-        self.orientation = arctan2(farY-y, farX-x)
+        self.orientation = rad2deg(arctan2(farY-y, farX-x))
 
     def getLocation(self):
         return self.x, self.y
@@ -41,7 +41,15 @@ class BlobFinder:
         self.filterImage   = self._filter(self.highPassImage, sigma)
         self.labeledImage, numFeatures = self._label(self.filterImage)
 
-        assert 0<numFeatures<2, "There are {} recognized objects, there can only be one".format(numFeatures)
+        ###
+        locs = find_objects(self.labeledImage)
+        tmp = []
+        for l in locs:
+            tmp.append((l[0].stop - l[0].start)*(l[1].stop - l[1].start))
+        featureLabel = argmax(tmp)+1
+        self.labeledImage[self.labeledImage!=featureLabel]=0
+        self.labeledImage[self.labeledImage==featureLabel]=1
+        ###
         y, x = self._findCenter(self.labeledImage)
         farY, farX  = self._findFarEdge(self.labeledImage)
         blob = Blob(x, y, farX, farY)
