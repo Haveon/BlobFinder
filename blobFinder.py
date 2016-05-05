@@ -93,3 +93,7 @@ if __name__ == '__main__':
     finder = BlobFinder(args.tgtFname, args.refFname)
     blob = finder.findBlob(cutoff=args.cutoff, sigma=args.sigma)
     print blob
+    for i,p in enumerate([finder.image, finder.highPassImage, finder.filterImage, finder.labeledImage]):
+        plt.subplot(221+i)
+        plt.imshow(p)
+    plt.show()
