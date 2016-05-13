@@ -1,5 +1,6 @@
 from scipy.ndimage import imread, label, center_of_mass, gaussian_filter, sobel, find_objects
-from numpy import nonzero, argmax, arctan2, rad2deg
+from skimage.filters import threshold_otsu
+from numpy import nonzero, argmax, arctan2, rad2deg, sum
 from argparse import ArgumentParser
 from matplotlib import pyplot as plt
 
@@ -36,20 +37,22 @@ class BlobFinder:
         gray = 0.2989*r + 0.5870*g + 0.1140*b
         return gray
 
-    def findBlob(self, cutoff=100, sigma=3):
+    def findBlob(self, cutoff=-1, sigma=3):
+        if cutoff == -1:
+            cutoff = threshold_otsu(self.image)
         self.highPassImage = self._highPass(self.image, cutoff)
         self.filterImage   = self._filter(self.highPassImage, sigma)
         self.labeledImage, numFeatures = self._label(self.filterImage)
 
-        ###
         locs = find_objects(self.labeledImage)
-        tmp = []
+        areas = []
         for l in locs:
-            tmp.append((l[0].stop - l[0].start)*(l[1].stop - l[1].start))
-        featureLabel = argmax(tmp)+1
+            area = sum(self.labeledImage[l[0].start:l[0].stop,l[1].start:l[1].stop]>0)
+            areas.append(area)
+        featureLabel = argmax(areas)+1
         self.labeledImage[self.labeledImage!=featureLabel]=0
         self.labeledImage[self.labeledImage==featureLabel]=1
-        ###
+
         y, x = self._findCenter(self.labeledImage)
         farY, farX  = self._findFarEdge(self.labeledImage)
         blob = Blob(x, y, farX, farY)
@@ -95,7 +98,7 @@ if __name__ == '__main__':
     parser.add_argument('tgtFname', help='Filepath to target image')
     parser.add_argument('refFname', help='Filepath to reference image')
     parser.add_argument('--sigma', default=3, type=int, help='Value of Sigma in gaussian_filter')
-    parser.add_argument('--cutoff', default=100, type=int, help='Truncation Threshold')
+    parser.add_argument('--cutoff', default=-1, type=int, help='Truncation Threshold')
 
     args = parser.parse_args()
     finder = BlobFinder(args.tgtFname, args.refFname)
